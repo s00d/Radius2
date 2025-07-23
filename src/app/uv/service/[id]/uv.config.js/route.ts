@@ -16,12 +16,10 @@ export async function GET(
   const uvConfig = {
     prefix: `/uv/service/${id}/`,
     bare: bareUrl,
-    encodeUrl: 'Ultraviolet.codec.xor.encode',
-    decodeUrl: 'Ultraviolet.codec.xor.decode',
     handler: '/uv/uv.handler.js',
     client: '/uv/uv.client.js',
     bundle: '/uv/uv.bundle.js',
-    config: `/uv/service/${id}/uv.config.js`,
+    config: `/uv/${id}/uv.config.js`,
     sw: '/uv/uv.sw.js',
   }
 

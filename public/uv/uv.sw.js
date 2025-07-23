@@ -7,7 +7,6 @@
   class i extends e.EventEmitter {
     constructor(t = __uv$config) {
       super(), t.bare || (t.bare = "/bare/"), t.prefix || (t.prefix = "/service/"), this.config = t;
-      console.log(1111, t)
       const r = (Array.isArray(t.bare) ? t.bare : [t.bare]).map((e => new URL(e, location).toString()));
       this.address = r[~~(Math.random() * r.length)], this.bareClient = new e.BareClient(this.address)
     }

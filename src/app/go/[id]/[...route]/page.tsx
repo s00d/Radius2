@@ -71,37 +71,61 @@ export default function Route({ params }: { params: { id: string, route: string[
 
   function handleLoad() {
     console.log('🔧 Interface: handleLoad called')
-    
+
     if (!ref.current || !ref.current.contentWindow) {
       console.log('🔧 Interface: No iframe or contentWindow')
       return
     }
-    
+
     const contentWindow = ref.current.contentWindow as ContentWindow
     console.log('🔧 Interface: ContentWindow:', contentWindow)
 
-    // Проверяем, существует ли __uv$location
-    if (!('__uv$location' in contentWindow) || !contentWindow.__uv$location) {
-      console.log('🔧 Interface: No __uv$location found')
-      // Попробуем получить заголовок напрямую
+    // Функция для попытки получения заголовка
+    const tryGetTitle = () => {
       try {
-        const title = contentWindow.document.title
-        console.log('🔧 Interface: Direct title:', title)
-        if (title && title !== '') {
-          setTabName(title)
-          setTabIcon((contentWindow.document.querySelector("link[rel*='icon']") as HTMLLinkElement)?.href || '')
+        // Проверяем, существует ли __uv$location
+        if ('__uv$location' in contentWindow && contentWindow.__uv$location) {
+          console.log('🔧 Interface: __uv$location found:', contentWindow.__uv$location)
+          setTabName(contentWindow.document.title)
+          setTabIcon((contentWindow.document.querySelector("link[rel*='icon']") as HTMLLinkElement)?.href || `${contentWindow.__uv$location.origin}/favicon.ico`)
           setIsLoading(false)
+          return true
+        } else {
+          console.log('🔧 Interface: No __uv$location found, trying direct title')
+          const title = contentWindow.document.title
+          console.log('🔧 Interface: Direct title:', title)
+          if (title && title !== '') {
+            setTabName(title)
+            setTabIcon((contentWindow.document.querySelector("link[rel*='icon']") as HTMLLinkElement)?.href || '')
+            setIsLoading(false)
+            return true
+          }
         }
       } catch (error) {
         console.log('🔧 Interface: Error getting title:', error)
       }
-      return
+      return false
     }
 
-    console.log('🔧 Interface: __uv$location found:', contentWindow.__uv$location)
-    setTabName(contentWindow.document.title)
-    setTabIcon((contentWindow.document.querySelector("link[rel*='icon']") as HTMLLinkElement)?.href || `${contentWindow.__uv$location.origin}/favicon.ico`)
-    setIsLoading(false)
+    // Пробуем сразу
+    if (!tryGetTitle()) {
+      // Если не получилось, пробуем через интервалы
+      let attempts = 0
+      const maxAttempts = 2
+      const interval = setInterval(() => {
+        attempts++
+        console.log(`🔧 Interface: Retry attempt ${attempts}/${maxAttempts}`)
+
+        if (tryGetTitle() || attempts >= maxAttempts) {
+          clearInterval(interval)
+          if (attempts >= maxAttempts) {
+            console.log('🔧 Interface: Max attempts reached, setting default title')
+            setTabName('Unknown')
+            setIsLoading(false)
+          }
+        }
+      }, 500)
+    }
   }
 
   return (
