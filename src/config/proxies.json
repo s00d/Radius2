@@ -1,0 +1,34 @@
+{
+  "proxies": [
+    {
+      "id": "proxy1",
+      "name": "Proxy 1",
+      "host": "149.126.220.203",
+      "port": 50100,
+      "username": "uMdKx0ek",
+      "password": "UTZLpvmV6s",
+      "protocol": "http",
+      "description": "Основной прокси сервер"
+    },
+    {
+      "id": "proxy2", 
+      "name": "Proxy 2",
+      "host": "149.126.220.203",
+      "port": 50101,
+      "username": "uMdKx0ek",
+      "password": "UTZLpvmV6s",
+      "protocol": "http",
+      "description": "Резервный прокси сервер"
+    },
+    {
+      "id": "direct",
+      "name": "Прямое соединение",
+      "host": "",
+      "port": 0,
+      "username": "",
+      "password": "",
+      "protocol": "http",
+      "description": "Без прокси"
+    }
+  ]
+} 
