@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import store from 'store2'
 import ProxyEditor from '@/components/proxy-editor'
-import { getProxyConfig } from '@/lib/indexeddb'
 
 export default function Home() {
   const router = useRouter()
@@ -48,7 +47,7 @@ export default function Home() {
                 // Получаем текущий прокси и его ID
                 let proxyId = 'direct'
                 try {
-                  const proxyConfig = await getProxyConfig()
+                  const proxyConfig = store.get('proxyConfig')
                   if (proxyConfig) {
                     const response = await fetch('/api/proxies')
 

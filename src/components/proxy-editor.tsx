@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Settings, Save, Trash2, Check, Globe } from 'lucide-react'
-import { getProxyConfig, saveProxyConfig, clearProxyConfig } from '@/lib/indexeddb'
+import store from 'store2'
 
 interface ProxyConfig {
   id: string
@@ -46,8 +46,8 @@ export default function ProxyEditor() {
           console.error('Failed to load proxy list')
         }
 
-        // Загружаем текущий прокси из IndexedDB
-        const savedProxy = await getProxyConfig()
+        // Загружаем текущий прокси из store
+        const savedProxy = store.get('proxyConfig')
         if (savedProxy) {
           // Находим соответствующий прокси в списке
           const matchingProxy = proxyListData.find((p: ProxyConfig) => 
@@ -85,7 +85,7 @@ export default function ProxyEditor() {
   const handleSelectProxy = async (proxy: ProxyConfig) => {
     setLoading(true)
     try {
-      // Сохраняем выбранный прокси в IndexedDB
+      // Сохраняем выбранный прокси в store
       const proxyData = {
         protocol: proxy.protocol,
         host: proxy.host,
@@ -94,7 +94,7 @@ export default function ProxyEditor() {
         password: proxy.password || undefined
       }
       
-      await saveProxyConfig(proxyData)
+      store.set('proxyConfig', proxyData)
       
       // Отправляем данные в service worker
       if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
@@ -121,8 +121,8 @@ export default function ProxyEditor() {
   const handleClearProxyConfig = async () => {
     setLoading(true)
     try {
-      // Удаляем из IndexedDB
-      await clearProxyConfig()
+      // Удаляем из store
+      store.remove('proxyConfig')
       
       setCurrentProxy(null)
       setIsEnabled(false)

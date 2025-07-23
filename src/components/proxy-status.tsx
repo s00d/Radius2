@@ -14,7 +14,7 @@ const Badge = ({ variant = 'default', className = '', children }: { variant?: 'd
     </span>
   )
 }
-import { getProxyConfig } from '@/lib/indexeddb'
+import store from 'store2'
 import { Settings, Wifi, WifiOff } from 'lucide-react'
 
 interface ProxyStatusProps {
@@ -27,9 +27,9 @@ export default function ProxyStatus({ className = '' }: ProxyStatusProps) {
   const [proxyName, setProxyName] = useState<string>('')
 
   useEffect(() => {
-    const loadProxyStatus = async () => {
+    const loadProxyStatus = () => {
       try {
-        const config = await getProxyConfig()
+        const config = store.get('proxyConfig')
         setProxyConfig(config)
       } catch (error) {
         console.error('Failed to load proxy status:', error)

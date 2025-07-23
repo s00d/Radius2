@@ -70,12 +70,35 @@ export default function Route({ params }: { params: { id: string, route: string[
   }, [showIframe, route, proxyId])
 
   function handleLoad() {
-    if (!ref.current || !ref.current.contentWindow) return
+    console.log('🔧 Interface: handleLoad called')
+    
+    if (!ref.current || !ref.current.contentWindow) {
+      console.log('🔧 Interface: No iframe or contentWindow')
+      return
+    }
+    
     const contentWindow = ref.current.contentWindow as ContentWindow
+    console.log('🔧 Interface: ContentWindow:', contentWindow)
 
     // Проверяем, существует ли __uv$location
-    if (!('__uv$location' in contentWindow) || !contentWindow.__uv$location) return
+    if (!('__uv$location' in contentWindow) || !contentWindow.__uv$location) {
+      console.log('🔧 Interface: No __uv$location found')
+      // Попробуем получить заголовок напрямую
+      try {
+        const title = contentWindow.document.title
+        console.log('🔧 Interface: Direct title:', title)
+        if (title && title !== '') {
+          setTabName(title)
+          setTabIcon((contentWindow.document.querySelector("link[rel*='icon']") as HTMLLinkElement)?.href || '')
+          setIsLoading(false)
+        }
+      } catch (error) {
+        console.log('🔧 Interface: Error getting title:', error)
+      }
+      return
+    }
 
+    console.log('🔧 Interface: __uv$location found:', contentWindow.__uv$location)
     setTabName(contentWindow.document.title)
     setTabIcon((contentWindow.document.querySelector("link[rel*='icon']") as HTMLLinkElement)?.href || `${contentWindow.__uv$location.origin}/favicon.ico`)
     setIsLoading(false)
@@ -129,6 +152,10 @@ export default function Route({ params }: { params: { id: string, route: string[
                 ref={ref}
                 className="w-full h-full border-0"
                 onLoad={handleLoad}
+                onError={(e) => {
+                  console.error('🔧 Interface: iframe error:', e)
+                  setIsLoading(false)
+                }}
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
               />
             )}
